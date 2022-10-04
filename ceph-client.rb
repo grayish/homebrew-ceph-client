@@ -1,14 +1,8 @@
 class CephClient < Formula
   desc "Ceph client tools and libraries"
   homepage "https://ceph.com"
-  url "https://download.ceph.com/tarballs/ceph-17.2.0.tar.gz"
-  sha256 "6cf2d838904f0c40a2c735790b543063ea675c727e6b7047ebddfa1e7505e71f"
-
-  bottle do
-    rebuild 2
-    root_url "https://github.com/mulbc/homebrew-ceph-client/releases/download/quincy-17.2.0-2"
-    sha256 cellar: :any, arm64_monterey: "ce4b9c49fa3f6dcea28819fc3a190dbe78b23a3685407bef666ab76b1d25c25d"
-  end
+  url "https://download.ceph.com/tarballs/ceph-17.2.4.tar.gz"
+  sha256 "de24a91242054f07d6af6cca2b1190b17f4a53b567f910a0eda271da885f3839"
 
   # depends_on "osxfuse"
   depends_on "boost"
@@ -21,6 +15,7 @@ class CephClient < Formula
   depends_on "pkg-config" => :build
   depends_on "python3"
   depends_on "sphinx-doc" => :build
+  depends_on "snappy" => :build
   depends_on "yasm"
   def caveats
     <<-EOS.undent
@@ -91,8 +86,6 @@ class CephClient < Formula
       ceph-conf
       ceph-fuse
       manpages
-      cython_rados
-      cython_rbd
     ]
     mkdir "build" do
       system "cmake", "-G", "Ninja", "..", *args, *std_cmake_args
@@ -147,7 +140,9 @@ class CephClient < Formula
       ].each do |name|
         man8.install "doc/man/#{name}.8"
       end
-      system "ninja", "src/pybind/install", "src/include/install"
+      # system "ninja", "src/pybind/install", "src/include/install"
+      system "ninja", "src/include/install"
+
     end
 
     bin.env_script_all_files(libexec/"bin", :PYTHONPATH => ENV["PYTHONPATH"])
@@ -177,8 +172,8 @@ class CephClient < Formula
     system "#{bin}/ceph-fuse", "--version"
     system "#{bin}/rbd", "--version"
     system "#{bin}/rados", "--version"
-    system "python", "-c", "import rados"
-    system "python", "-c", "import rbd"
+    # system "python", "-c", "import rados"
+    # system "python", "-c", "import rbd"
   end
 end
 
